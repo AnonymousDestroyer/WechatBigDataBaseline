@@ -9,15 +9,21 @@ from deepctr_torch.models.deepfm import *
 from deepctr_torch.models.basemodel import *
 
 # 存储数据的根目录
-ROOT_PATH = "../data"
+ROOT_PATH = "./data"
+
 # 比赛数据集路径
 DATASET_PATH = ROOT_PATH + '/wechat_algo_data1/'
+
+
 # 训练集
 USER_ACTION = DATASET_PATH + "user_action.csv"
 FEED_INFO = DATASET_PATH + "feed_info.csv"
 FEED_EMBEDDINGS = DATASET_PATH + "feed_embeddings.csv"
+
+
 # 测试集
 TEST_FILE = DATASET_PATH + "test_a.csv"
+
 # 初赛待预测行为列表
 ACTION_LIST = ["read_comment", "like", "click_avatar", "forward"]
 FEA_COLUMN_LIST = ["read_comment", "like", "click_avatar", "forward", "comment", "follow", "favorite"]
@@ -25,6 +31,7 @@ FEA_FEED_LIST = ['feedid', 'authorid', 'videoplayseconds', 'bgm_song_id', 'bgm_s
 # 负样本下采样比例(负样本:正样本)
 ACTION_SAMPLE_RATE = {"read_comment": 5, "like": 5, "click_avatar": 5, "forward": 10, "comment": 10, "follow": 10,
                       "favorite": 10}
+
 
 class MyBaseModel(BaseModel):
 
@@ -47,8 +54,8 @@ class MyBaseModel(BaseModel):
                     'When passing a `validation_data` argument, '
                     'it must contain either 2 items (x_val, y_val), '
                     'or 3 items (x_val, y_val, val_sample_weights), '
-                    'or alternatively it could be a dataset or a '
-                    'dataset or a dataset iterator. '
+                    'or alternatively it could be a data or a '
+                    'data or a data iterator. '
                     'However we received `validation_data=%s`' % validation_data)
             if isinstance(val_x, dict):
                 val_x = [val_x[feature] for feature in self.feature_index]
@@ -230,6 +237,7 @@ class MyBaseModel(BaseModel):
 
         return np.concatenate(pred_ans).astype("float64")
 
+
 class MyDeepFM(MyBaseModel):
     def __init__(self,
                  linear_feature_columns, dnn_feature_columns, use_fm=True,
@@ -239,8 +247,8 @@ class MyDeepFM(MyBaseModel):
                  dnn_activation='relu', dnn_use_bn=False, task='binary', device='cpu', gpus=None):
 
         super(MyDeepFM, self).__init__(linear_feature_columns, dnn_feature_columns, l2_reg_linear=l2_reg_linear,
-                                     l2_reg_embedding=l2_reg_embedding, init_std=init_std, seed=seed, task=task,
-                                     device=device, gpus=gpus)
+                                       l2_reg_embedding=l2_reg_embedding, init_std=init_std, seed=seed, task=task,
+                                       device=device, gpus=gpus)
 
         self.use_fm = use_fm
         self.use_dnn = len(dnn_feature_columns) > 0 and len(
@@ -289,7 +297,7 @@ if __name__ == "__main__":
         train = pd.read_csv(ROOT_PATH + f'/train_data_for_{action}.csv')[USE_FEAT]
         train = train.sample(frac=1, random_state=42).reset_index(drop=True)
         print("posi prop:")
-        print(sum((train[action]==1)*1)/train.shape[0])
+        print(sum((train[action] == 1) * 1) / train.shape[0])
         test = pd.read_csv(ROOT_PATH + '/test_data.csv')[[i for i in USE_FEAT if i != action]]
         target = [action]
         test[target[0]] = 0
@@ -319,7 +327,8 @@ if __name__ == "__main__":
             linear_feature_columns + dnn_feature_columns)
 
         # 3.generate input data for model
-        train, test = data.iloc[:train.shape[0]].reset_index(drop=True), data.iloc[train.shape[0]:].reset_index(drop=True)
+        train, test = data.iloc[:train.shape[0]].reset_index(drop=True), data.iloc[train.shape[0]:].reset_index(
+            drop=True)
         train_model_input = {name: train[name] for name in feature_names}
         test_model_input = {name: test[name] for name in feature_names}
 
@@ -331,12 +340,12 @@ if __name__ == "__main__":
             device = 'cuda:0'
 
         model = MyDeepFM(linear_feature_columns=linear_feature_columns, dnn_feature_columns=dnn_feature_columns,
-                       task='binary',
-                       l2_reg_embedding=1e-1, device=device)
+                         task='binary',
+                         l2_reg_embedding=1e-1, device=device)
 
         model.compile("adagrad", "binary_crossentropy", metrics=["binary_crossentropy", "auc"])
 
-        history = model.fit(train_model_input, train[target].values, batch_size=512, epochs=5, verbose=1,
+        history = model.fit(train_model_input, train[target].values, batch_size=512, epochs=100, verbose=1,
                             validation_split=0.2)
         pred_ans = model.predict(test_model_input, 128)
         submit[action] = pred_ans

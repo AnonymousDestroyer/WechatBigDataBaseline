@@ -5,19 +5,24 @@ from tqdm import tqdm
 
 
 # 存储数据的根目录
-ROOT_PATH = "../data"
+ROOT_PATH = "./data"
+
 # 比赛数据集路径
 DATASET_PATH = ROOT_PATH + '/wechat_algo_data1/'
+
 # 训练集
 USER_ACTION = DATASET_PATH + "user_action.csv"
 FEED_INFO = DATASET_PATH + "feed_info.csv"
 FEED_EMBEDDINGS = DATASET_PATH + "feed_embeddings.csv"
+
 # 测试集
 TEST_FILE = DATASET_PATH + "test_a.csv"
+
 # 初赛待预测行为列表
 ACTION_LIST = ["read_comment", "like", "click_avatar", "forward"]
 FEA_COLUMN_LIST = ["read_comment", "like", "click_avatar", "forward", "comment", "follow", "favorite"]
 FEA_FEED_LIST = ['feedid', 'authorid', 'videoplayseconds', 'bgm_song_id', 'bgm_singer_id']
+
 # 负样本下采样比例(负样本:正样本)
 ACTION_SAMPLE_RATE = {"read_comment": 5, "like": 5, "click_avatar": 5, "forward": 10, "comment": 10, "follow": 10,
                       "favorite": 10}
@@ -34,6 +39,7 @@ def process_embed(train):
     temp = pd.DataFrame(columns=[f"embed{i}" for i in range(512)], data=feed_embed_array)
     train = pd.concat((train, temp), axis=1)
     return train
+
 
 def prepare_data():
     feed_info_df = pd.read_csv(FEED_INFO)
@@ -57,3 +63,4 @@ def prepare_data():
 
 if __name__ == "__main__":
     prepare_data()
+
