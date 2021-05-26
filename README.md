@@ -18,7 +18,7 @@
 4. test_a.csv: A榜测试集
 5. submit_demo_初赛a.csv: A榜提交结果demo
 
-####生成数据集
+#### 生成数据集
 1. train_data_for_click_avatar.csv
 2. train_data_for_forward.csv
 3. train_data_for_like.csv
@@ -36,11 +36,13 @@
 - baseline.py: 模型训练，评估，提交
 
 ## 4.运行流程
+
 - 新建data目录，下载比赛数据集，放在data目录下并解压，得到wechat_algo_data1目录
 - 数据集生成：运行prepare_data.py
 - 模型训练，评估，提交：运行baseline.py
 
 ## 5.模型及参数
+
 模型：DeepFM
 
 参数：

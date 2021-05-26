@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import torch
+import sys
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from tqdm import tqdm
 from deepctr_torch.inputs import SparseFeat, DenseFeat, get_feature_names
@@ -27,6 +28,7 @@ TEST_FILE = DATASET_PATH + "test_a.csv"
 ACTION_LIST = ["read_comment", "like", "click_avatar", "forward"]
 FEA_COLUMN_LIST = ["read_comment", "like", "click_avatar", "forward", "comment", "follow", "favorite"]
 FEA_FEED_LIST = ['feedid', 'authorid', 'videoplayseconds', 'bgm_song_id', 'bgm_singer_id']
+
 # 负样本下采样比例(负样本:正样本)
 ACTION_SAMPLE_RATE = {"read_comment": 5, "like": 5, "click_avatar": 5, "forward": 10, "comment": 10, "follow": 10,
                       "favorite": 10}
@@ -36,11 +38,26 @@ class MyBaseModel(BaseModel):
 
     def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=1, initial_epoch=0, validation_split=0.,
             validation_data=None, shuffle=True, callbacks=None):
+        '''
+
+        :param x:
+        :param y:
+        :param batch_size: batch_size
+        :param epochs:
+        :param verbose:
+        :param initial_epoch:
+        :param validation_split:
+        :param validation_data:
+        :param shuffle:
+        :param callbacks:
+        :return:
+        '''
 
         if isinstance(x, dict):
             x = [x[feature] for feature in self.feature_index]
 
         do_validation = False
+
         if validation_data:
             do_validation = True
             if len(validation_data) == 2:
@@ -72,6 +89,7 @@ class MyBaseModel(BaseModel):
         else:
             val_x = []
             val_y = []
+
         for i in range(len(x)):
             if len(x[i].shape) == 1:
                 x[i] = np.expand_dims(x[i], axis=1)
@@ -80,6 +98,7 @@ class MyBaseModel(BaseModel):
             torch.from_numpy(
                 np.concatenate(x, axis=-1)),
             torch.from_numpy(y))
+
         if batch_size is None:
             batch_size = 256
 
@@ -163,6 +182,7 @@ class MyBaseModel(BaseModel):
                 eval_result = self.evaluate(val_x, val_y, batch_size)
                 for name, result in eval_result.items():
                     epoch_logs["val_" + name] = result
+
             # verbose
             if verbose > 0:
                 epoch_time = int(time.time() - start_time)
@@ -290,13 +310,19 @@ class MyDeepFM(MyBaseModel):
 
 
 if __name__ == "__main__":
+
     submit = pd.read_csv(ROOT_PATH + '/test_data.csv')[['userid', 'feedid']]
+
     for action in ACTION_LIST:
         USE_FEAT = ['userid', 'feedid', action] + FEA_FEED_LIST[1:]
+        print(USE_FEAT)
+        sys.exit()
+
         train = pd.read_csv(ROOT_PATH + f'/train_data_for_{action}.csv')[USE_FEAT]
         train = train.sample(frac=1, random_state=42).reset_index(drop=True)
         print("posi prop:")
         print(sum((train[action] == 1) * 1) / train.shape[0])
+
         test = pd.read_csv(ROOT_PATH + '/test_data.csv')[[i for i in USE_FEAT if i != action]]
         target = [action]
         test[target[0]] = 0
@@ -349,5 +375,6 @@ if __name__ == "__main__":
         pred_ans = model.predict(test_model_input, 128)
         submit[action] = pred_ans
         torch.cuda.empty_cache()
+
     # 保存提交文件
     submit.to_csv("./submit_base_deepfm.csv", index=False)
