@@ -1,7 +1,6 @@
-# 2021中国高校计算机大赛-微信大数据挑战赛Baseline（Pytorch版）
+# Wechat Big Data competition - Baseline（Pytorch）
 
-代码实现基于[DeepCTR](https://github.com/shenweichen/DeepCTR-Torch)，只做了简单数据预处理，采用的是基本特征（离散特征：{'userid', 'feedid', 'authorid', 'bgm_song_id', 'bgm_singer_id'}，连续特征：{'videoplayseconds'}），单个任务逐个预测，大家可以尝试改进原有的模块，并尝试新的模型和新的建模方法。
-baseline纯为学习和参考，有什么做的不对的地方，还请大佬们批评和指正😄
+代码实现基于[DeepCTR](https://github.com/shenweichen/DeepCTR-Torch)
 
 ## 1.环境配置
 - python3
@@ -9,6 +8,22 @@ baseline纯为学习和参考，有什么做的不对的地方，还请大佬们
 - deepctr-torch 0.2.6
 - pandas 1.0.1
 - scikit-learn 0.22.1
+
+## 2.数据集
+
+#### 原始数据集
+1. user_action.csv: 用户行为表
+2. feed_info.csv: Feed信息表
+3. feed_embeddings.csv: Feed向量表
+4. test_a.csv: A榜测试集
+5. submit_demo_初赛a.csv: A榜提交结果demo
+
+####生成数据集
+1. train_data_for_click_avatar.csv
+2. train_data_for_forward.csv
+3. train_data_for_like.csv
+4. train_data_for_read_comment.csv
+5. test_data.csv
 
 ## 2.运行配置
 - CPU/GPU均可

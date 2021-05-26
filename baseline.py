@@ -14,10 +14,9 @@ ROOT_PATH = "./data"
 # 比赛数据集路径
 DATASET_PATH = ROOT_PATH + '/wechat_algo_data1/'
 
-
 # 训练集
-USER_ACTION = DATASET_PATH + "user_action.csv"
-FEED_INFO = DATASET_PATH + "feed_info.csv"
+USER_ACTION = DATASET_PATH + "user_action.csv" # userid,feedid,date_,device,read_comment,comment,like,play,stay,click_avatar,forward,follow,favorite
+FEED_INFO = DATASET_PATH + "feed_info.csv" #feedid,authorid,videoplayseconds,description,ocr,asr,bgm_song_id,bgm_singer_id,manual_keyword_list,machine_keyword_list,manual_tag_list,machine_tag_list,description_char,ocr_char,asr_char
 FEED_EMBEDDINGS = DATASET_PATH + "feed_embeddings.csv"
 
 
